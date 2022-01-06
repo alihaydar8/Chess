@@ -132,20 +132,13 @@ bool condition_base(int x, int y){
 
 void deplace_piece(int x1 ,int y1, int x2, int y2){
     if(condition_base(x1,y1) && condition_base(x2,y2)){
-        piece c;
-        c = board[x1][y1];
-        board[x1][y1] = board[x2][y2] ;
-        board[x2][y2] = c ;
+        board[x2][y2] = board[x1][y1] ;
+        board[x1][y1].nom_piece = '-';
     }
 }
 
-bool isBlack(int x,int y){
-    if(condition_base(x,y) && board[x][y].color_piece == 'b') return true;
-    else return false;
-}
-
-bool isWhite(int x,int y){
-    if(condition_base(x,y) && board[x][y].color_piece == 'w') return true;
+bool isColor(char color ,int x,int y){
+    if(condition_base(x,y) && board[x][y].color_piece == color) return true;
     else return false;
 }
 
@@ -174,8 +167,8 @@ bool isQueen(int x,int y){
     else return false;
 }
 
-bool isKing(int x,int y){
-    if(condition_base(x,y) && board[x][y].nom_piece == 'K') return true;
+bool isKingColor(char color,int x,int y){
+    if(condition_base(x,y) && board[x][y].nom_piece == 'K' && board[x][y].color_piece == color) return true;
     else return false;
 }
 
@@ -207,7 +200,7 @@ tab_Case P_possibility(int x , int y){
     tab_Case tab_case;
     tab_case.possibel=(Case*)malloc(4*sizeof(Case));/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     tab_case.num=0;
-    if(isWhite(x,y)){
+    if(isColor('w',x,y)){
         if(isEmpty(x+1,y)){
             tab_case.possibel[tab_case.num].x=x+1;
             tab_case.possibel[tab_case.num].y=y;
@@ -218,18 +211,18 @@ tab_Case P_possibility(int x , int y){
             tab_case.possibel[tab_case.num].y=y;
             tab_case.num++; 
         }
-        if(isBlack(x+1,y+1)){
+        if(isColor('b',x+1,y+1)){
             tab_case.possibel[tab_case.num].x=x+1;
             tab_case.possibel[tab_case.num].y=y+1;
             tab_case.num++;
         }
-        if(isBlack(x+1,y-1)){
+        if(isColor('b',x+1,y-1)){
             tab_case.possibel[tab_case.num].x=x+1;
             tab_case.possibel[tab_case.num].y=y-1;
             tab_case.num++;
         }
     }
-    if(isBlack(x,y)){
+    if(isColor('b',x,y)){
         if(isEmpty(x-1,y) && x-1>0){
             tab_case.possibel[tab_case.num].x=x-1;
             tab_case.possibel[tab_case.num].y=y;
@@ -240,12 +233,12 @@ tab_Case P_possibility(int x , int y){
             tab_case.possibel[tab_case.num].y=y;
             tab_case.num++; 
         }
-        if(isWhite(x-1,y+1)){
+        if(isColor('w',x-1,y+1)){
             tab_case.possibel[tab_case.num].x=x-1;
             tab_case.possibel[tab_case.num].y=y+1;
             tab_case.num++;
         }
-        if(isWhite(x-1,y-1)){
+        if(isColor('w',x-1,y-1)){
             tab_case.possibel[tab_case.num].x=x-1;
             tab_case.possibel[tab_case.num].y=y-1;
             tab_case.num++;
@@ -521,89 +514,49 @@ tab_Case K_possibility(int x ,int y){
     tab_Case tab_case;
     tab_case.possibel=(Case*)malloc(8*sizeof(Case));/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     tab_case.num=0;
-    if(isWhite(x,y)){
-        if(!isCase_appartient_tab_Case(allPossibility('b'),x,y+1) && isPossible(x,y,x,y+1)){
-            tab_case.possibel[tab_case.num].x=x;
-            tab_case.possibel[tab_case.num].y=y+1;
-            tab_case.num++; 
-        }
-        if(!isCase_appartient_tab_Case(allPossibility('b'),x,y-1) && isPossible(x,y,x,y-1)){
-            tab_case.possibel[tab_case.num].x=x;
-            tab_case.possibel[tab_case.num].y=y-1;
-            tab_case.num++; 
-        }
-        if(!isCase_appartient_tab_Case(allPossibility('b'),x+1,y) && isPossible(x,y,x+1,y)){
-            tab_case.possibel[tab_case.num].x=x+1;
-            tab_case.possibel[tab_case.num].y=y;
-            tab_case.num++; 
-        }
-        if(!isCase_appartient_tab_Case(allPossibility('b'),x-1,y) && isPossible(x,y,x-1,y)){
-            tab_case.possibel[tab_case.num].x=x-1;
-            tab_case.possibel[tab_case.num].y=y;
-            tab_case.num++; 
-        }
-        if(!isCase_appartient_tab_Case(allPossibility('b'),x+1,y+1) && isPossible(x,y,x+1,y+1)){
-            tab_case.possibel[tab_case.num].x=x+1;
-            tab_case.possibel[tab_case.num].y=y+1;
-            tab_case.num++; 
-        }
-        if(!isCase_appartient_tab_Case(allPossibility('b'),x-1,y-1) && isPossible(x,y,x-1,y-1)){
-            tab_case.possibel[tab_case.num].x=x-1;
-            tab_case.possibel[tab_case.num].y=y-1;
-            tab_case.num++; 
-        }
-        if(!isCase_appartient_tab_Case(allPossibility('b'),x+1,y-1) && isPossible(x,y,x+1,y-1)){
-            tab_case.possibel[tab_case.num].x=x+1;
-            tab_case.possibel[tab_case.num].y=y-1;
-            tab_case.num++; 
-        }
-        if(!isCase_appartient_tab_Case(allPossibility('b'),x-1,y+1) && isPossible(x,y,x-1,y+1)){
-            tab_case.possibel[tab_case.num].x=x-1;
-            tab_case.possibel[tab_case.num].y=y+1;
-            tab_case.num++; 
-        }
+    char color ='b';
+    if(isColor('b',x,y)){
+        color ='w';
     }
-    if(isBlack(x,y)){
-        if(!isCase_appartient_tab_Case(allPossibility('w'),x,y+1) && isPossible(x,y,x,y+1)){
-            tab_case.possibel[tab_case.num].x=x;
-            tab_case.possibel[tab_case.num].y=y+1;
-            tab_case.num++; 
-        }
-        if(!isCase_appartient_tab_Case(allPossibility('w'),x,y-1) && isPossible(x,y,x,y-1)){
-            tab_case.possibel[tab_case.num].x=x;
-            tab_case.possibel[tab_case.num].y=y-1;
-            tab_case.num++; 
-        }
-        if(!isCase_appartient_tab_Case(allPossibility('w'),x+1,y) && isPossible(x,y,x+1,y)){
-            tab_case.possibel[tab_case.num].x=x+1;
-            tab_case.possibel[tab_case.num].y=y;
-            tab_case.num++; 
-        }
-        if(!isCase_appartient_tab_Case(allPossibility('w'),x-1,y) && isPossible(x,y,x-1,y)){
-            tab_case.possibel[tab_case.num].x=x-1;
-            tab_case.possibel[tab_case.num].y=y;
-            tab_case.num++; 
-        }
-        if(!isCase_appartient_tab_Case(allPossibility('w'),x+1,y+1) && isPossible(x,y,x+1,y+1)){
-            tab_case.possibel[tab_case.num].x=x+1;
-            tab_case.possibel[tab_case.num].y=y+1;
-            tab_case.num++; 
-        }
-        if(!isCase_appartient_tab_Case(allPossibility('w'),x-1,y-1) && isPossible(x,y,x-1,y-1)){
-            tab_case.possibel[tab_case.num].x=x-1;
-            tab_case.possibel[tab_case.num].y=y-1;
-            tab_case.num++; 
-        }
-        if(!isCase_appartient_tab_Case(allPossibility('w'),x+1,y-1) && isPossible(x,y,x+1,y-1)){
-            tab_case.possibel[tab_case.num].x=x+1;
-            tab_case.possibel[tab_case.num].y=y-1;
-            tab_case.num++; 
-        }
-        if(!isCase_appartient_tab_Case(allPossibility('w'),x-1,y+1) && isPossible(x,y,x-1,y+1)){
-            tab_case.possibel[tab_case.num].x=x-1;
-            tab_case.possibel[tab_case.num].y=y+1;
-            tab_case.num++; 
-        }
+    if(!isCase_appartient_tab_Case(allPossibility(color),x,y+1) && isPossible(x,y,x,y+1) && !isKingColor(color,x,y+2) && !isKingColor(color,x+1,y+2) && !isKingColor(color,x-1,y+2) ){
+        tab_case.possibel[tab_case.num].x=x;
+        tab_case.possibel[tab_case.num].y=y+1;
+        tab_case.num++; 
+    }
+    if(!isCase_appartient_tab_Case(allPossibility(color),x,y-1) && isPossible(x,y,x,y-1) && !isKingColor(color,x,y-2) && !isKingColor(color,x+1,y-2) && !isKingColor(color,x-1,y-2) ){
+        tab_case.possibel[tab_case.num].x=x;
+        tab_case.possibel[tab_case.num].y=y-1;
+        tab_case.num++; 
+    }
+    if(!isCase_appartient_tab_Case(allPossibility(color),x+1,y) && isPossible(x,y,x+1,y) && !isKingColor(color,x+2,y) && !isKingColor(color,x+2,y+1) && !isKingColor(color,x+2,y-1) ){
+        tab_case.possibel[tab_case.num].x=x+1;
+        tab_case.possibel[tab_case.num].y=y;
+        tab_case.num++; 
+    }
+    if(!isCase_appartient_tab_Case(allPossibility(color),x-1,y) && isPossible(x,y,x-1,y) && !isKingColor(color,x-2,y) && !isKingColor(color,x-2,y+1) && !isKingColor(color,x-2,y-1)){
+        tab_case.possibel[tab_case.num].x=x-1;
+        tab_case.possibel[tab_case.num].y=y;
+        tab_case.num++; 
+    }
+    if(!isCase_appartient_tab_Case(allPossibility(color),x+1,y+1) && isPossible(x,y,x+1,y+1) && !isKingColor(color,x,y+2) && !isKingColor(color,x+1,y+2) && !isKingColor(color,x+2,y+2) && !isKingColor(color,x+2,y+1) && !isKingColor(color,x+2,y) ){
+        tab_case.possibel[tab_case.num].x=x+1;
+        tab_case.possibel[tab_case.num].y=y+1;
+        tab_case.num++; 
+    }
+    if(!isCase_appartient_tab_Case(allPossibility(color),x-1,y-1) && isPossible(x,y,x-1,y-1) && !isKingColor(color,x,y-2) && !isKingColor(color,x-1,y-2) && !isKingColor(color,x-2,y-2) && !isKingColor(color,x-2,y-1) && !isKingColor(color,x-2,y) ){
+        tab_case.possibel[tab_case.num].x=x-1;
+        tab_case.possibel[tab_case.num].y=y-1;
+        tab_case.num++; 
+    }
+    if(!isCase_appartient_tab_Case(allPossibility(color),x+1,y-1) && isPossible(x,y,x+1,y-1) && !isKingColor(color,x+2,y) && !isKingColor(color,x+2,y-1) && !isKingColor(color,x+2,y-2) && !isKingColor(color,x+1,y-2) && !isKingColor(color,x,y-2) ){
+        tab_case.possibel[tab_case.num].x=x+1;
+        tab_case.possibel[tab_case.num].y=y-1;
+        tab_case.num++; 
+    }
+    if(!isCase_appartient_tab_Case(allPossibility(color),x-1,y+1) && isPossible(x,y,x-1,y+1) && !isKingColor(color,x,y+2) && !isKingColor(color,x-1,y+2) && !isKingColor(color,x-2,y+2) && !isKingColor(color,x-2,y+1) && !isKingColor(color,x-2,y) ){
+        tab_case.possibel[tab_case.num].x=x-1;
+        tab_case.possibel[tab_case.num].y=y+1;
+        tab_case.num++; 
     }
     return tab_case;
 }
@@ -613,13 +566,14 @@ tab_Case K_possibility(int x ,int y){
 int main (){
     board = (piece**)malloc(8*sizeof(piece));
     initialisation();
-    // display_board();
+    // display_board();     
     deplace_piece(0,3,3,3);
     deplace_piece(1,1,3,1);
     deplace_piece(7,7,3,5);
     deplace_piece(0,4,2,5);
+    deplace_piece(7,4,2,7);
     display_board();
-    tab_Case tab_case = K_possibility(6,2);
+    tab_Case tab_case = K_possibility(2,5);
     // for(int i=0;i<tab_case.num;i++){
     //     printf("%d,%d\n",tab_case.possibel[i].x,tab_case.possibel[i].y);
     // }
