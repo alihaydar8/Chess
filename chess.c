@@ -3,6 +3,15 @@
 #include <string.h>
 #include <stdbool.h>
 
+#define Pawn 'P'
+#define Knight 'H'
+#define Bishop 'B'
+#define Rook 'R'
+#define Queen 'Q'
+#define King 'K'
+#define White 'W'
+#define Black 'b'
+
 typedef struct piece{
     int point ;
     char nom_piece;
@@ -21,70 +30,140 @@ typedef struct tab_Case{
 
 piece **board;
 
-void display_board(){
-    printf("\t");
+void display_player1_board(){
+    printf("\t\x1B[33m");
     for(int i=0;i<8;i++)printf("%d\t",i);
-    printf("\n");
+    printf("\x1B[0m\n");
     for(int i=0;i<8;i++){
-        printf("%d\t",i);
+        printf("\x1B[33m%d\x1B[0m\t",i);
         for(int j=0;j<8;j++){
-            if(board[i][j].color_piece == 'w'){
+            if(board[i][j].color_piece == White){
                 printf("\x1B[31m");
                 printf("%c\t",board[i][j].nom_piece); 
                 printf("\x1B[0m");
             }
-            else if(board[i][j].color_piece == 'b'){
+            else if(board[i][j].color_piece == Black){
                 printf("\x1B[32m");
                 printf("%c\t",board[i][j].nom_piece); 
                 printf("\x1B[0m");
             }
-            else{printf("%c\t",board[i][j].nom_piece);}  
-            //   printf("%s\t",board[i][j].nom_piece);
+            else{
+                printf("%c\t",board[i][j].nom_piece);
+            }  
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+void display_player2_board(){
+    printf("\t\x1B[33m");
+    for(int i=0;i<8;i++)printf("%d\t",i);
+    printf("\x1B[0m\n");
+    for(int i=0;i<8;i++){
+        printf("\x1B[33m%d\x1B[0m\t",i);
+        for(int j=0;j<8;j++){
+            if(board[7-i][j].color_piece == White){
+                printf("\x1B[31m");
+                printf("%c\t",board[7-i][j].nom_piece); 
+                printf("\x1B[0m");
+            }
+            else if(board[7-i][j].color_piece == Black){
+                printf("\x1B[32m");
+                printf("%c\t",board[7-i][j].nom_piece); 
+                printf("\x1B[0m");
+            }
+            else{
+                printf("%c\t",board[7-i][j].nom_piece);
+            }  
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+void display_player1_possibility(tab_Case tab_case){
+    bool trouver = false;
+    printf("\t\x1B[33m");
+    for(int i=0;i<8;i++)printf("%d\t",i);
+    printf("\x1B[0m\n");
+    for(int i=0;i<8;i++){
+       printf("\x1B[33m%d\x1B[0m\t",i);
+        for(int j=0;j<8;j++){
+            trouver = false;
+            for(int k=0;k<tab_case.num;k++){
+                if(i==tab_case.possibel[k].x && j==tab_case.possibel[k].y){
+                    if(board[i][j].color_piece == White || board[i][j].color_piece == Black){
+                        printf("\x1B[34m");
+                        printf("x\t"); 
+                        printf("\x1B[0m");
+                    }
+                    else{
+                        printf("\x1B[33m");
+                        printf("x\t"); 
+                        printf("\x1B[0m");
+                    }
+                    trouver = true;
+                }
+            }
+            if(trouver == false){
+                if(board[i][j].color_piece == White){
+                    printf("\x1B[31m");
+                    printf("%c\t",board[i][j].nom_piece); 
+                    printf("\x1B[0m");
+                }
+                else if(board[i][j].color_piece == Black){
+                    printf("\x1B[32m");
+                    printf("%c\t",board[i][j].nom_piece); 
+                    printf("\x1B[0m");
+                }
+                else{printf("%c\t",board[i][j].nom_piece);}
+            }
         }
         printf("\n");
     }
 }
 
-void display_possibility(tab_Case tab_case){
+void display_player2_possibility(tab_Case tab_case){
     bool trouver = false;
-    printf("\t");
+    printf("\t\x1B[33m");
     for(int i=0;i<8;i++)printf("%d\t",i);
-    printf("\n");
-
+    printf("\x1B[0m\n");
     for(int i=0;i<8;i++){
-        printf("%d\t",i);
+       printf("\x1B[33m%d\x1B[0m\t",i);
         for(int j=0;j<8;j++){
             trouver = false;
             for(int k=0;k<tab_case.num;k++){
-                if(i==tab_case.possibel[k].x && j==tab_case.possibel[k].y){
-                    if(board[i][j].color_piece == 'w' || board[i][j].color_piece == 'b'){
-                        printf("\x1B[33m");
+                if(i==7-tab_case.possibel[k].x && j==tab_case.possibel[k].y){
+                    if(board[7-i][j].color_piece == White || board[7-i][j].color_piece == Black){
+                        printf("\x1B[34m");
                         printf("x\t"); 
                         printf("\x1B[0m");
                     }
                     else{
-                        printf("x\t");
+                        printf("\x1B[33m");
+                        printf("x\t"); 
+                        printf("\x1B[0m");
                     }
                     trouver = true;
                 }
             }
-        if(trouver == false){
-            if(board[i][j].color_piece == 'w'){
-                printf("\x1B[31m");
-                printf("%c\t",board[i][j].nom_piece); 
-                printf("\x1B[0m");
+            if(trouver == false){
+                if(board[7-i][j].color_piece == White){
+                    printf("\x1B[31m");
+                    printf("%c\t",board[7-i][j].nom_piece); 
+                    printf("\x1B[0m");
+                }
+                else if(board[7-i][j].color_piece == Black){
+                    printf("\x1B[32m");
+                    printf("%c\t",board[7-i][j].nom_piece); 
+                    printf("\x1B[0m");
+                }
+                else{printf("%c\t",board[7-i][j].nom_piece);}
             }
-            else if(board[i][j].color_piece == 'b'){
-                printf("\x1B[32m");
-                printf("%c\t",board[i][j].nom_piece); 
-                printf("\x1B[0m");
-            }
-            else{printf("%c\t",board[i][j].nom_piece);}
-        }
         }
         printf("\n");
     }
-
 }
 
 void initialisation(){
@@ -93,33 +172,33 @@ void initialisation(){
         board[i]=(piece*)malloc(8*sizeof(piece));
         for (int j=0;j<8;j++){
             if(i==1 || i==6){
-                board[i][j].nom_piece ='P';
+                board[i][j].nom_piece =Pawn;
             }
             if( i== 2 || i==3 || i==4 || i==5 ){
                 board[i][j].nom_piece ='-';
             }
             if(i == 7 || i == 0 ){
                 if(j == 0 || j == 7){
-                    board[i][j].nom_piece = 'R';
+                    board[i][j].nom_piece = Rook;
                 }
                 if(j == 1 || j == 6){
-                    board[i][j].nom_piece = 'H';
+                    board[i][j].nom_piece = Knight;
                 }
                 if(j == 2 || j == 5){
-                    board[i][j].nom_piece = 'B';
+                    board[i][j].nom_piece = Bishop;
                 }
                 if(j == 3){
-                    board[i][j].nom_piece = 'Q';
+                    board[i][j].nom_piece = Queen;
                 }
                 if(j == 4){
-                    board[i][j].nom_piece = 'K';
+                    board[i][j].nom_piece = King;
                 }
             }
             if( i == 0 || i == 1){
-                board[i][j].color_piece = 'w';
+                board[i][j].color_piece = White;
             }
             if( i == 6 || i == 7){
-                board[i][j].color_piece = 'b';
+                board[i][j].color_piece = Black;
             }
         }
     }
@@ -134,6 +213,7 @@ void deplace_piece(int x1 ,int y1, int x2, int y2){
     if(condition_base(x1,y1) && condition_base(x2,y2)){
         board[x2][y2] = board[x1][y1] ;
         board[x1][y1].nom_piece = '-';
+        board[x1][y1].color_piece = ' ';
     }
 }
 
@@ -143,32 +223,32 @@ bool isColor(char color ,int x,int y){
 }
 
 bool isPawn(int x,int y){
-    if(condition_base(x,y) && board[x][y].nom_piece == 'P') return true;
+    if(condition_base(x,y) && board[x][y].nom_piece == Pawn) return true;
     else return false;
 }
 
 bool isRook(int x,int y){
-    if(condition_base(x,y) && board[x][y].nom_piece == 'R') return true;
+    if(condition_base(x,y) && board[x][y].nom_piece == Rook) return true;
     else return false;
 }
 
 bool isBishop(int x,int y){
-    if(condition_base(x,y) && board[x][y].nom_piece == 'B') return true;
+    if(condition_base(x,y) && board[x][y].nom_piece == Bishop) return true;
     else return false;
 }
 
 bool isKnight(int x,int y){
-    if(condition_base(x,y) && board[x][y].nom_piece == 'H') return true;
+    if(condition_base(x,y) && board[x][y].nom_piece == Knight) return true;
     else return false;
 }
 
 bool isQueen(int x,int y){
-    if(condition_base(x,y) && board[x][y].nom_piece == 'Q') return true;
+    if(condition_base(x,y) && board[x][y].nom_piece == Queen) return true;
     else return false;
 }
 
 bool isKingColor(char color,int x,int y){
-    if(condition_base(x,y) && board[x][y].nom_piece == 'K' && board[x][y].color_piece == color) return true;
+    if(condition_base(x,y) && board[x][y].nom_piece == King && board[x][y].color_piece == color) return true;
     else return false;
 }
 
@@ -200,7 +280,7 @@ tab_Case P_possibility(int x , int y){
     tab_Case tab_case;
     tab_case.possibel=(Case*)malloc(4*sizeof(Case));/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     tab_case.num=0;
-    if(isColor('w',x,y)){
+    if(isColor(White,x,y)){
         if(isEmpty(x+1,y)){
             tab_case.possibel[tab_case.num].x=x+1;
             tab_case.possibel[tab_case.num].y=y;
@@ -211,18 +291,18 @@ tab_Case P_possibility(int x , int y){
             tab_case.possibel[tab_case.num].y=y;
             tab_case.num++; 
         }
-        if(isColor('b',x+1,y+1)){
+        if(isColor(Black,x+1,y+1)){
             tab_case.possibel[tab_case.num].x=x+1;
             tab_case.possibel[tab_case.num].y=y+1;
             tab_case.num++;
         }
-        if(isColor('b',x+1,y-1)){
+        if(isColor(Black,x+1,y-1)){
             tab_case.possibel[tab_case.num].x=x+1;
             tab_case.possibel[tab_case.num].y=y-1;
             tab_case.num++;
         }
     }
-    if(isColor('b',x,y)){
+    if(isColor(Black,x,y)){
         if(isEmpty(x-1,y) && x-1>0){
             tab_case.possibel[tab_case.num].x=x-1;
             tab_case.possibel[tab_case.num].y=y;
@@ -233,12 +313,12 @@ tab_Case P_possibility(int x , int y){
             tab_case.possibel[tab_case.num].y=y;
             tab_case.num++; 
         }
-        if(isColor('w',x-1,y+1)){
+        if(isColor(White,x-1,y+1)){
             tab_case.possibel[tab_case.num].x=x-1;
             tab_case.possibel[tab_case.num].y=y+1;
             tab_case.num++;
         }
-        if(isColor('w',x-1,y-1)){
+        if(isColor(White,x-1,y-1)){
             tab_case.possibel[tab_case.num].x=x-1;
             tab_case.possibel[tab_case.num].y=y-1;
             tab_case.num++;
@@ -314,7 +394,7 @@ tab_Case R_possibility(int x , int y){
     return tab_case;
 }
 
-tab_Case H_possibility(int x , int y){
+tab_Case K_possibility(int x , int y){
     tab_Case tab_case;  
     tab_case.possibel=(Case*)malloc(8*sizeof(Case));/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     tab_case.num=0;
@@ -477,7 +557,7 @@ tab_Case allPossibility(char color){
                     tab_case =  ajouter_tab_Case(tab_case,B_possibility(i,j));
                 }
                 if(isKnight(i,j)){
-                    tab_case =  ajouter_tab_Case(tab_case,H_possibility(i,j));
+                    tab_case =  ajouter_tab_Case(tab_case,K_possibility(i,j));
                 }
                 if(isRook(i,j)){
                     tab_case =  ajouter_tab_Case(tab_case,R_possibility(i,j));
@@ -510,13 +590,13 @@ bool isCase_appartient_tab_Case(tab_Case tab_case,int x,int y){
     return false;
 }
 
-tab_Case K_possibility(int x ,int y){
+tab_Case King_possibility(int x ,int y){
     tab_Case tab_case;
     tab_case.possibel=(Case*)malloc(8*sizeof(Case));/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     tab_case.num=0;
-    char color ='b';
-    if(isColor('b',x,y)){
-        color ='w';
+    char color = Black;
+    if(isColor(Black,x,y)){
+        color =White;
     }
     if(!isCase_appartient_tab_Case(allPossibility(color),x,y+1) && isPossible(x,y,x,y+1) && !isKingColor(color,x,y+2) && !isKingColor(color,x+1,y+2) && !isKingColor(color,x-1,y+2) ){
         tab_case.possibel[tab_case.num].x=x;
@@ -560,24 +640,75 @@ tab_Case K_possibility(int x ,int y){
     }
     return tab_case;
 }
-
-
+tab_Case possibility(int x,int y){
+    switch (board[x][y].nom_piece){
+        case Pawn : 
+            return P_possibility(x,y);
+        case Rook :
+            return R_possibility(x,y);
+        case Knight :
+            return K_possibility(x,y);
+        case King :
+            return King_possibility(x,y);
+        case Queen :
+            return Q_possibility(x,y);
+        case Bishop :
+            return B_possibility(x,y);
+        default:
+            printf("il y a pas de pieace");
+            break;
+    }
+}  
 
 int main (){
+    int choix0 ;
+    int choix1 ;
+    tab_Case temp = NULL;
     board = (piece**)malloc(8*sizeof(piece));
     initialisation();
-    // display_board();     
-    deplace_piece(0,3,3,3);
-    deplace_piece(1,1,3,1);
-    deplace_piece(7,7,3,5);
-    deplace_piece(0,4,2,5);
-    deplace_piece(7,4,2,7);
-    display_board();
-    tab_Case tab_case = K_possibility(2,5);
-    // for(int i=0;i<tab_case.num;i++){
-    //     printf("%d,%d\n",tab_case.possibel[i].x,tab_case.possibel[i].y);
-    // }
-    printf("\n");
-    display_possibility(tab_case);
+    while(true){
+        display_player1_board();
+        do{
+            printf("\x1B[31mchoisie la pieace pour voir les possibility\n\x1B[0m");
+            scanf("%d",&choix0);
+            if(board[choix0/10][choix0%10].nom_piece == '-'){
+                printf("\x1B[31mil y a pas de pieace\n\x1B[0m");
+            }
+        }while(board[choix0/10][choix0%10].nom_piece == '-' || board[choix0/10][choix0%10].nom_piece == White);
+        free(temp);
+        temp = possibility(choix0/10,choix0%10);
+        display_player1_possibility(temp);
+        do{
+            printf("\x1B[31mchoisie ou placer la pieace \x1B[0m");
+            scanf("%d",&choix1);
+            if(!isCase_appartient_tab_Case(temp,choix1/10,choix1%10)){
+                printf("\x1B[31melle peut pas partir si loin\n\x1B[0m ");
+            }
+        }while(!isCase_appartient_tab_Case(temp,choix1/10,choix1%10));
+        deplace_piece(choix0/10,choix0%10,choix1/10,choix1%10);
+
+        display_player2_board();
+        do{
+            printf("\x1B[32mchoisie la pieace pour voir les possibility\n\x1B[0m");
+            scanf("%d",&choix0);
+            if(board[7-(choix0/10)][choix0%10].nom_piece == '-'){
+                printf("\x1B[32mil y a pas de pieace\n\x1B[0m");
+            }
+        }while(board[7-(choix0/10)][choix0%10].nom_piece == '-' || board[7-(choix0/10)][choix0%10].nom_piece == Black);
+        free(temp)
+        temp = possibility(7-(choix0/10),choix0%10)
+        display_player2_possibility(temp);
+        do{
+            printf("\x1B[32mchoisie ou placer la pieace\x1B[0m ");
+            scanf("%d",&choix1);
+            if(!isCase_appartient_tab_Case(temp,7-(choix1/10),choix1%10)){
+                printf("\x1B[32melle peut pas partir si loin\n\x1B[0m ");
+            }
+        }while(!isCase_appartient_tab_Case(temp,7-(choix1/10),choix1%10));
+        deplace_piece(7-(choix0/10),choix0%10,7-(choix1/10),choix1%10);
+
+    }
+    
+
     return 0;
 }
