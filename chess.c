@@ -209,14 +209,6 @@ bool condition_base(int x, int y){
     else return false;
 }
 
-void deplace_piece(int x1 ,int y1, int x2, int y2){
-    if(condition_base(x1,y1) && condition_base(x2,y2)){
-        board[x2][y2] = board[x1][y1] ;
-        board[x1][y1].nom_piece = '-';
-        board[x1][y1].color_piece = ' ';
-    }
-}
-
 bool isColor(char color ,int x,int y){
     if(condition_base(x,y) && board[x][y].color_piece == color) return true;
     else return false;
@@ -267,6 +259,44 @@ bool isPossible(int x1 ,int y1, int x2, int y2){
         else return true;
     }
     else return false; 
+}
+
+void transformepPawn(int x , int y){
+    int choix = 0 ;
+    printf("\x1B[33mChoisir la piece pour transformer le pawn\n");
+    printf("1 pour Queen\n");
+    printf("2 pour Knight\n");
+    printf("3 pour Bishop\n");
+    printf("4 pour Rook\x1B[0m\n");
+    scanf("%d",&choix);
+    switch (choix){
+        case 1 :
+            board[x][y].nom_piece = Queen ;
+            break;
+        case 2 :
+            board[x][y].nom_piece = Knight ;
+            break;
+        case 3 :
+            board[x][y].nom_piece = Bishop ;
+            break;
+        case 4 :
+            board[x][y].nom_piece = Rook ;
+            break;
+        default :
+            board[x][y].nom_piece = Queen ;
+            break;
+    }
+}
+
+void deplace_piece(int x1 ,int y1, int x2, int y2){
+    if(condition_base(x1,y1) && condition_base(x2,y2)){
+        board[x2][y2] = board[x1][y1] ;
+        board[x1][y1].nom_piece = '-';
+        board[x1][y1].color_piece = ' ';
+        if( (x2 == 0 || x2 == 7) && isPawn(x2,y2) ){
+            transformepPawn(x2,y2);   
+        }
+    }
 }
 
 // tab_Case remplire_tab_Case(tab_Case tab_case,int num,int x,int y)
@@ -640,6 +670,7 @@ tab_Case King_possibility(int x ,int y){
     }
     return tab_case;
 }
+
 tab_Case possibility(int x,int y){
     switch (board[x][y].nom_piece){
         case Pawn : 
@@ -654,61 +685,74 @@ tab_Case possibility(int x,int y){
             return Q_possibility(x,y);
         case Bishop :
             return B_possibility(x,y);
-        default:
+        default :
             printf("il y a pas de pieace");
             break;
     }
 }  
 
+int choisirPiecePossibiltyPlayer1(){
+    int choix0 ;
+    do{
+        printf("\x1B[31mchoisie la piece pour voir les possibility\n\x1B[0m");
+        scanf("%d",&choix0);
+        if(isEmpty(choix0/10,choix0%10)){
+            printf("\x1B[31mil y a pas de piece\n\x1B[0m");
+        }
+    }while(isEmpty(choix0/10,choix0%10) || isColor(Black,choix0/10,choix0%10));
+    display_player1_possibility(possibility(choix0/10,choix0%10));
+    return choix0;
+}
+
+int choisirPiecePossibiltyPlayer2(){
+    int choix0 ;
+    do{
+        printf("\x1B[32mchoisie la piece pour voir les possibility\n\x1B[0m");
+        scanf("%d",&choix0);
+        if(isEmpty(7-choix0/10,choix0%10)){
+            printf("\x1B[32mil y a pas de piece\n\x1B[0m");
+        }
+    }while(isEmpty(7-choix0/10,choix0%10) || isColor(White,7-choix0/10,choix0%10));
+    display_player2_possibility(possibility(7-(choix0/10),choix0%10));
+    return choix0;
+}
+
 int main (){
     int choix0 ;
     int choix1 ;
-    tab_Case temp = NULL;
     board = (piece**)malloc(8*sizeof(piece));
     initialisation();
     while(true){
+        
         display_player1_board();
+        choix0 = choisirPiecePossibiltyPlayer1();
         do{
-            printf("\x1B[31mchoisie la pieace pour voir les possibility\n\x1B[0m");
-            scanf("%d",&choix0);
-            if(board[choix0/10][choix0%10].nom_piece == '-'){
-                printf("\x1B[31mil y a pas de pieace\n\x1B[0m");
-            }
-        }while(board[choix0/10][choix0%10].nom_piece == '-' || board[choix0/10][choix0%10].nom_piece == White);
-        free(temp);
-        temp = possibility(choix0/10,choix0%10);
-        display_player1_possibility(temp);
-        do{
-            printf("\x1B[31mchoisie ou placer la pieace \x1B[0m");
+            printf("\x1B[31mchoisie ou placer la piece ou 99 pour choisir une autre piece pour voir les possibility \x1B[0m");
             scanf("%d",&choix1);
-            if(!isCase_appartient_tab_Case(temp,choix1/10,choix1%10)){
+            if(choix1 == 99 ){
+                choix0 = choisirPiecePossibiltyPlayer1();
+            }
+            else if(!isCase_appartient_tab_Case(possibility(choix0/10,choix0%10),choix1/10,choix1%10)){
                 printf("\x1B[31melle peut pas partir si loin\n\x1B[0m ");
             }
-        }while(!isCase_appartient_tab_Case(temp,choix1/10,choix1%10));
+        }while(!isCase_appartient_tab_Case(possibility(choix0/10,choix0%10),choix1/10,choix1%10) || choix1 == 99 );
         deplace_piece(choix0/10,choix0%10,choix1/10,choix1%10);
 
         display_player2_board();
+        choix0 = choisirPiecePossibiltyPlayer2();
         do{
-            printf("\x1B[32mchoisie la pieace pour voir les possibility\n\x1B[0m");
-            scanf("%d",&choix0);
-            if(board[7-(choix0/10)][choix0%10].nom_piece == '-'){
-                printf("\x1B[32mil y a pas de pieace\n\x1B[0m");
-            }
-        }while(board[7-(choix0/10)][choix0%10].nom_piece == '-' || board[7-(choix0/10)][choix0%10].nom_piece == Black);
-        free(temp)
-        temp = possibility(7-(choix0/10),choix0%10)
-        display_player2_possibility(temp);
-        do{
-            printf("\x1B[32mchoisie ou placer la pieace\x1B[0m ");
+            printf("\x1B[32mchoisie ou placer la piece ou 99 pour choisir une autre piece pour voir les possibility\x1B[0m ");
             scanf("%d",&choix1);
-            if(!isCase_appartient_tab_Case(temp,7-(choix1/10),choix1%10)){
+            if(choix1 == 99 ){
+                choix0 = choisirPiecePossibiltyPlayer2();
+            }
+            else if(!isCase_appartient_tab_Case(possibility(7-(choix0/10),choix0%10),7-(choix1/10),choix1%10)){
                 printf("\x1B[32melle peut pas partir si loin\n\x1B[0m ");
             }
-        }while(!isCase_appartient_tab_Case(temp,7-(choix1/10),choix1%10));
+        }while(!isCase_appartient_tab_Case(possibility(7-(choix0/10),choix0%10),7-(choix1/10),choix1%10));
         deplace_piece(7-(choix0/10),choix0%10,7-(choix1/10),choix1%10);
-
     }
     
-
     return 0;
 }
+
